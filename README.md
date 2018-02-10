@@ -18,9 +18,9 @@ username and password are set in the definitions.json, currently "me" and "me"
 
 Publish a message on "my_exchange"
 
-#### Extentions
+#### Extensions
 
-As this is designed to be a tutorial, other ideas include:
+As this is designed to be a tutorial, other ideas to add in future include:
 
 * using the RabbitMQ 3.7 style configuration using a .conf file
 * set up multiple queues and bindings with dead, sinbin, invalid, etc.
