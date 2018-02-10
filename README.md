@@ -30,6 +30,7 @@ As this is designed to be a tutorial, other ideas to add in future include:
 * Tutorials explaining how the docker-compose file works, including the volumes section
 * How to publish to the RabbitMQ manually and via ruby code.
 * Links to other useful pages
+* Some tips for using Dockerfiles and Docker-compose, inc installation
 
 #### Links
 
