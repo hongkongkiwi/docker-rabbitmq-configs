@@ -22,7 +22,6 @@ Publish a message on "my_exchange"
 
 As this is designed to be a tutorial, other ideas to add in future include:
 
-* using the RabbitMQ 3.7 style configuration using a .conf file
 * set up multiple queues and bindings with dead, sinbin, invalid, etc.
 * using RABBITMQ_ environment variables for configuration, eg the RABBITMQ_URL
 * using ENV.fetch
@@ -32,6 +31,10 @@ As this is designed to be a tutorial, other ideas to add in future include:
 * Links to other useful pages
 * Some tips for using Dockerfiles and Docker-compose, inc installation
 
+DONE
+
+* using RabbitMQ 3.7 style configuration .conf file
+
 #### Links
 
 * https://medium.com/@thomasdecaux/deploy-rabbitmq-with-docker-static-configuration-23ad39cdbf39
@@ -39,5 +42,3 @@ As this is designed to be a tutorial, other ideas to add in future include:
 * https://www.rabbitmq.com/configure.html
 * https://devops.datenkollektiv.de/creating-a-custom-rabbitmq-container-with-preconfigured-queues.html
 * https://www.cloudamqp.com/blog/2015-05-18-part1-rabbitmq-for-beginners-what-is-rabbitmq.html
-
-

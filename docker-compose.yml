@@ -1,7 +1,7 @@
 version: "3"
 services:
   rabbit:
-      image: rabbitmq:3-management
+      image: rabbitmq:3.7.3-management
       ports:
         - "15672:15672"
         - "5672:5672"
@@ -9,6 +9,5 @@ services:
         NAME: "rabbit"
       tty: true
       volumes:
-        - ./rabbitmq.config:/etc/rabbitmq/rabbitmq.config:ro
+        - ./rabbitmq.conf:/etc/rabbitmq.conf:ro
         - ./definitions.json:/etc/rabbitmq/definitions.json:ro
-      # command:  bash -c "sleep 10; rabbitmq-server;"
