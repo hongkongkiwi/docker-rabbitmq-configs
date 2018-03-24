@@ -6,32 +6,30 @@ This is designed as a tutorial and boilerplate that you can customise and extend
 
 #### Configuration
 
-Replacing the "user", "my_vhost", "my_exchange", "my_queue" and "bindings" with the ones you need.
+Open the definitions.json file and replace the names of user, my_vhost, exchanges and queues with the ones you need.
 
 #### Running the RabbitMQ
 
-`docker-compose up rabbit`
+`docker-compose up`
 
 login at localhost:15672
 
 username and password are set in the definitions.json, currently "me" and "me"
 
-Publish a message on "my_exchange"
+Click on the exchanges tab to view exchanges. The ones defined in definitions.json should be listed.
 
-#### Extensions
+Publish a message on "my_exchange" with routing key: "test"  
 
-As this is designed to be a tutorial, other ideas to add in future include:
+Click on the queues tab.
 
-* set up multiple queues and bindings with dead, sinbin, invalid, etc.
-* using RABBITMQ_ environment variables for configuration, eg the RABBITMQ_URL
-* using ENV.fetch
-* Tutorials explaining each aspect of the config
-* Tutorials explaining how the docker-compose file works, including the volumes section
-* How to publish to the RabbitMQ manually and via ruby code.
+`my_queue` should show a spike of activity as it received the message.
 
-DONE
+After the time to live value (set as 1000):
+- The message will be considered dead
+- It will be routed to the dead letter exchange: `my-exchange.dead`
+- This places the message in the queue `my_queue.dead`
 
-* using RabbitMQ 3.7 style configuration .conf file
+`my_queue.dead`should show an additional message
 
 #### Links
 
