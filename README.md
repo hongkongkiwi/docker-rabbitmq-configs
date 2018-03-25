@@ -24,12 +24,43 @@ Click on the queues tab.
 
 `my_queue` should show a spike of activity as it received the message.
 
-After the time to live value (set as 1000):
+After the time to live value (set as 10000, equivalent to 10 seconds):
 - The message will be considered dead
 - It will be routed to the dead letter exchange: `my-exchange.dead`
 - This places the message in the queue `my_queue.dead`
 
 `my_queue.dead`should show an additional message
+
+Publish a message on "my_exchange" with no routing key.  
+This should be listed in the unrouted queue
+
+Below explains how to set up these exchanges, queues and bindings. Either use the UI or amend the definitions.json file.
+
+#### The main exchange and queue
+
+Create an exchange "my-exchange". One of the simplest ways of routing is using a direct type exchange, where you define the "routing_key" in the bindings when linking the exchange to a queue. So for this example, specify the type as "direct".
+
+Define a queue, such as "my-queue", then the bindings between them with the source being the exchange and the destination the queue. The destination_type is queue. Then in the arguments state the routing key, for example `"routing_key":"test"`
+
+#### Dead letter exchange and queue
+
+- On your main queue, eg `my_queue`, add arguments
+    - "x-dead-letter-exchange": "my-exchange.dead"
+    - "x-message-ttl": 10000
+
+`x-message-ttl` is the variable that stores the amount of time a message should be kept on a queue before being considered dead and routed to the `dead-letter-exchange`
+
+- Define your dead letter exchange, eg "my-exchange.dead", and set it as type fanout
+- Define your dead letter queue, eg `my_queue.dead`
+- Bind the dead letter exchange to the dead letter queue
+
+#### Unrouted exchange and queue
+
+To create an exchange and queue for messages that cannot be routed due to not having a defined routing key or headers:
+- Add as an argument to your main exchange: `"alternate-exchange": "my-exchange.unrouted"`
+- Define your unrouted exchange as a fanout exchange
+- Define an unrouted queue
+- bind your unrouted exchange to your unrouted queue
 
 #### Links
 
