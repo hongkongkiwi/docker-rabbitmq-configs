@@ -62,6 +62,19 @@ To create an exchange and queue for messages that cannot be routed due to not ha
 - Define an unrouted queue
 - bind your unrouted exchange to your unrouted queue
 
+## Further Development
+
+- Key concepts, eg vhost is a host within a RabbitMQ instance, allowing multiple apps to use the same instance for different purposes, types of exchange etc
+- Write up setting up a RabbitMQ instance on Docker with a vhost, exchanges, queues and bindings
+- Creating a reusable Publisher
+- Creating a Consumer, including acknowledgements, rejects, re-queuing, and retry counts
+- Extracting message processing out of the worker using Observers
+
+Extensions  
+
+- Diagramming
+- Extracting definitions from a config yml file
+
 ## Links
 
 * https://medium.com/@thomasdecaux/deploy-rabbitmq-with-docker-static-configuration-23ad39cdbf39
