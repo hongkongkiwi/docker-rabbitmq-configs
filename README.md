@@ -4,11 +4,11 @@ An example of a RabbitMQ with custom configuration loaded with docker-compose
 
 This is designed as a tutorial and boilerplate that you can customise and extend for the setup you desire.
 
-#### Configuration
+## Configuration
 
 Open the definitions.json file and replace the names of user, my_vhost, exchanges and queues with the ones you need.
 
-#### Running the RabbitMQ
+## Running the RabbitMQ
 
 `docker-compose up`
 
@@ -36,13 +36,13 @@ This should be listed in the unrouted queue
 
 Below explains how to set up these exchanges, queues and bindings. Either use the UI or amend the definitions.json file.
 
-#### The main exchange and queue
+### The main exchange and queue
 
 Create an exchange "my-exchange". One of the simplest ways of routing is using a direct type exchange, where you define the "routing_key" in the bindings when linking the exchange to a queue. So for this example, specify the type as "direct".
 
 Define a queue, such as "my-queue", then the bindings between them with the source being the exchange and the destination the queue. The destination_type is queue. Then in the arguments state the routing key, for example `"routing_key":"test"`
 
-#### Dead letter exchange and queue
+### Dead letter exchange and queue
 
 - On your main queue, eg `my_queue`, add arguments
     - "x-dead-letter-exchange": "my-exchange.dead"
@@ -54,7 +54,7 @@ Define a queue, such as "my-queue", then the bindings between them with the sour
 - Define your dead letter queue, eg `my_queue.dead`
 - Bind the dead letter exchange to the dead letter queue
 
-#### Unrouted exchange and queue
+### Unrouted exchange and queue
 
 To create an exchange and queue for messages that cannot be routed due to not having a defined routing key or headers:
 - Add as an argument to your main exchange: `"alternate-exchange": "my-exchange.unrouted"`
@@ -62,7 +62,7 @@ To create an exchange and queue for messages that cannot be routed due to not ha
 - Define an unrouted queue
 - bind your unrouted exchange to your unrouted queue
 
-#### Links
+## Links
 
 * https://medium.com/@thomasdecaux/deploy-rabbitmq-with-docker-static-configuration-23ad39cdbf39
 * https://stackoverflow.com/questions/40280293/defining-a-queue-with-a-config-file-in-rabbitmq
