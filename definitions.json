@@ -39,18 +39,26 @@
     "auto_delete": false,
     "arguments": {
       "x-dead-letter-exchange": "my-exchange.dead",
-      "x-message-ttl": 1000
+      "x-message-ttl": 10000
+    }
+  },{
+    "name": "my-queue.unrouted",
+    "vhost": "/my-vhost",
+    "durable": false,
+    "auto_delete": false,
+    "arguments": {
     }
   }],
   "exchanges": [{
     "name": "my-exchange",
     "vhost": "/my-vhost",
-    "type": "headers",
+    "type": "direct",
     "durable": true,
     "auto_delete": false,
     "internal": false,
     "arguments": {
-      "x-match": "any"
+      "x-match": "any",
+      "alternate-exchange": "my-exchange.unrouted"
     }
   }, {
     "name": "my-exchange.dead",
@@ -60,20 +68,36 @@
     "auto_delete": false,
     "internal": false,
     "arguments": {}
-  }],
+  },{
+    "name": "my-exchange.unrouted",
+    "vhost": "/my-vhost",
+    "type": "fanout",
+    "durable": true,
+    "auto_delete": false,
+    "internal": false,
+    "arguments": {}
+    }],
   "bindings": [{
     "source": "my-exchange",
     "vhost": "/my-vhost",
     "destination": "my-queue",
     "destination_type": "queue",
     "routing_key": "test",
-    "arguments": {}
+    "arguments": {
+      "routing_key": "test"
+    }
   }, {
     "source": "my-exchange.dead",
     "vhost": "/my-vhost",
     "destination": "my-queue.dead",
     "destination_type": "queue",
     "routing_key": "",
+    "arguments": {}
+  },{
+    "source": "my-exchange.unrouted",
+    "vhost": "/my-vhost",
+    "destination": "my-queue.unrouted",
+    "destination_type": "queue",
     "arguments": {}
   }]
 }
