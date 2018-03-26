@@ -64,16 +64,19 @@ To create an exchange and queue for messages that cannot be routed due to not ha
 
 ## Further Development
 
-- Key concepts, eg vhost is a host within a RabbitMQ instance, allowing multiple apps to use the same instance for different purposes, types of exchange etc
 - Write up setting up a RabbitMQ instance on Docker with a vhost, exchanges, queues and bindings
-- Creating a reusable Publisher
+- Creating a reusable Publisher that can publish to various exchanges and queues
 - Creating a Consumer, including acknowledgements, rejects, re-queuing, and retry counts
 - Extracting message processing out of the worker using Observers
-
-Extensions  
-
-- Diagramming
 - Extracting definitions from a config yml file
+- Use Environment variables for username, password, connections string, setting defaults, etc
+
+Documentation  
+
+- How to use the ruby RabbitMQ module with the connection, publisher and worker
+- Diagramming
+- Key concepts, eg vhost is a host within a RabbitMQ instance, allowing multiple apps to use the same instance for different purposes, types of exchange etc
+- Issues to note, eg connecting to queues and exchanges with the same configuration that is in the RabbitMQ instance
 
 ## Links
 
