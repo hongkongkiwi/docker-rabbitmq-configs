@@ -5,8 +5,6 @@ services:
       ports:
         - "15672:15672"
         - "5672:5672"
-      labels:
-        NAME: "rabbit"
       tty: true
       volumes:
         - ./rabbitmq.conf:/etc/rabbitmq.conf:ro
