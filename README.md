@@ -4,11 +4,33 @@ An example of a RabbitMQ with custom configuration loaded with docker-compose
 
 This is designed as a tutorial and boilerplate that you can customise and extend for the setup you desire.
 
+There are instructions for using it via the RabbitMQ UI, as well as ruby module that allows you to send messages and process them.
+
 ## Configuration
 
 Open the definitions.json file and replace the names of user, my_vhost, exchanges and queues with the ones you need.
 
-## Running the RabbitMQ
+## Command line
+
+In one tab:
+- `docker-compose up`
+This will spin up the RabbitMQ instance and display its logs
+
+In the second tab:
+- `pry` / `irb`
+- `require 'lib/rabbit_mq'`
+- `RabbitMQ::Worker.run`
+This will start the worker that will consume from `my-queue`, log messages in the terminal acknowledge the messages have been received so RabbitMQ can remove them from the queue once processed.
+
+In the third tab:
+- `pry` / `irb`
+- `require 'lib/rabbit_mq'`
+- `RabbitMQ::Publisher.publish` + YOUR MESSAGE OR PAYLOAD
+This will send the message to `my-exchange`, which will route it to `my-queue` with the routing key `test`.
+
+See below for more on the configuration of the exchanges and queues.
+
+## RabbitMQ UI
 
 `docker-compose up`
 
