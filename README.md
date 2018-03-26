@@ -70,6 +70,7 @@ To create an exchange and queue for messages that cannot be routed due to not ha
 - Extracting message processing out of the worker using Observers
 - Extracting definitions from a config yml file
 - Use Environment variables for username, password, connections string, setting defaults, etc
+- Prefetch
 
 Documentation  
 
