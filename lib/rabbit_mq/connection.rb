@@ -15,7 +15,7 @@ module RabbitMQ
     end
 
     def close
-      @connection.close
+      @channel.close
     end
 
     def connection_string
