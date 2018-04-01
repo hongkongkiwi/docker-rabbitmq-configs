@@ -45,24 +45,9 @@
       "x-message-ttl": 5000
     }
   }, {
-    "name": "my-queue.sinbin",
-    "vhost": "my-vhost",
-    "durable": true,
-    "auto_delete": false,
-    "arguments": {
-      "x-dead-letter-exchange": "my-exchange",
-      "x-message-ttl": 5000
-    }
-  }, {
     "name": "my-queue.unrouted",
     "vhost": "my-vhost",
     "durable": false,
-    "auto_delete": false,
-    "arguments": {}
-  }, {
-    "name": "my-queue.invalid",
-    "vhost": "my-vhost",
-    "durable": true,
     "auto_delete": false,
     "arguments": {}
   }, {
