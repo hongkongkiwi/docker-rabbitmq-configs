@@ -4,6 +4,7 @@ GEM
     amq-protocol (2.3.0)
     bunny (2.9.2)
       amq-protocol (~> 2.3.0)
+    json (2.1.0)
     logger (1.2.8)
 
 PLATFORMS
@@ -11,6 +12,7 @@ PLATFORMS
 
 DEPENDENCIES
   bunny
+  json
   logger
 
 BUNDLED WITH
