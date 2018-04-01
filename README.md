@@ -13,11 +13,11 @@ Open the definitions.json file and replace the names of user, my_vhost, exchange
 ## Command line
 
 In one tab:
-- `docker-compose up`
+- `docker-compose up rabbit`
 This will spin up the RabbitMQ instance and display its logs
 
 In the second tab:
-- `ruby runner.rb`
+- `docker-compose up worker`
 This will start the worker that will consume from `my-queue`, log messages in the terminal acknowledge the messages have been received so RabbitMQ can remove them from the queue once processed.
 
 In the third tab:
@@ -52,7 +52,7 @@ After the time to live value (set as 10000, equivalent to 10 seconds):
 `my_queue.dead`should show an additional message
 
 Publish a message on "my_exchange" with no routing key.  
-This should be listed in the unrouted queue
+This should be listed in the `unrouted` queue
 
 Below explains how to set up these exchanges, queues and bindings. Either use the UI or amend the definitions.json file.
 
@@ -71,29 +71,50 @@ Define a queue, such as "my-queue", then the bindings between them with the sour
 `x-message-ttl` is the variable that stores the amount of time a message should be kept on a queue before being considered dead and routed to the `dead-letter-exchange`
 
 - Define your dead letter exchange, eg "my-exchange.dead", and set it as type fanout
-- Define your dead letter queue, eg `my_queue.dead`
+- Define your dead letter queue, eg `my-queue.dead`
 - Bind the dead letter exchange to the dead letter queue
+
+### Retry exchange and queue
+
+- Create `my-queue.retry` queue bound to `my-exchange.retry`
+- Create exchange `my-exchange.retry` with arguments:
+  - Set `x-dead-letter-exchange` to `my-exchange`
+  - Set `x-message-ttl` to a retry-ttl variable, eg 300000 ms (5 minutes)
+
+- When you have an issue with a message from `my-queue`
+  - nack the message `channel.nack(delivery_info.delivery_tag)`
+  - then publish to the `my-exchange.retry`
+  - after the retry-ttl, it will be sent to `my-exchange`, then `my-queue`
+
+- To stop an infinite loop, you need to include a publish_count with a maximum value.
+  - Ensure you parse the payload, eg if it is JSON
+  - if your payload is a hash, you can do payload['publish_count'] = 1, then increment it for subsequent times
+  - if publish_count reached the maximum value, nack the message to send it to the dead queue
 
 ### Unrouted exchange and queue
 
 To create an exchange and queue for messages that cannot be routed due to not having a defined routing key or headers:
-- Add as an argument to your main exchange: `"alternate-exchange": "my-exchange.unrouted"`
+- Add as an argument to your main exchange: `"alternate-exchange": "my-exchange.dead"`
 - Define your unrouted exchange as a fanout exchange
 - Define an unrouted queue
 - bind your unrouted exchange to your unrouted queue
 
 ## Further Development
 
-- Write up setting up a RabbitMQ instance on Docker with a vhost, exchanges, queues and bindings
-- Creating a reusable Publisher that can publish to various exchanges and queues
-- Creating a Consumer, including acknowledgements, rejects, re-queuing, and retry counts
-- Extracting message processing out of the worker using Observers
 - Extracting definitions from a config yml file
 - Use Environment variables for username, password, connections string, setting defaults, etc
 - Prefetch
+- Purging and destroying queues
 
 Documentation  
 
+- Use nack to send to dead queue
+- Use ack for successfully consumed message
+- Use nack when republishing from consumer, eg to retry queue, otherwise it will leave message `unacked` on a queue
+- Write up setting up a RabbitMQ instance on Docker with a vhost, exchanges, queues and bindings
+- Publisher that can publish to various exchanges
+- Creating a Consumer, including acknowledgements, rejects, re-queuing, and retry counts
+- Extracting message processing out of the worker using Observers
 - How to use the ruby RabbitMQ module with the connection, publisher and worker
 - Diagramming
 - Key concepts, eg vhost is a host within a RabbitMQ instance, allowing multiple apps to use the same instance for different purposes, types of exchange etc
@@ -106,3 +127,4 @@ Documentation
 * https://www.rabbitmq.com/configure.html
 * https://devops.datenkollektiv.de/creating-a-custom-rabbitmq-container-with-preconfigured-queues.html
 * https://www.cloudamqp.com/blog/2015-05-18-part1-rabbitmq-for-beginners-what-is-rabbitmq.html
+* https://medium.com/@kiennguyen88/rabbitmq-delay-retry-schedule-with-dead-letter-exchange-31fb25a440fc
