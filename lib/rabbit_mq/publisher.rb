@@ -49,6 +49,15 @@ module RabbitMQ
         )
     end
 
+    def invalid(payload)
+      channel
+        .queue('my-queue.invalid', durable: true)
+        .publish(
+          format_payload(payload),
+          persistent: true
+        )
+    end
+
     def dead(payload)
       channel
         .queue('my-queue.dead', durable: true)
