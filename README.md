@@ -17,9 +17,7 @@ In one tab:
 This will spin up the RabbitMQ instance and display its logs
 
 In the second tab:
-- `pry` / `irb`
-- `require 'lib/rabbit_mq'`
-- `RabbitMQ::Worker.run`
+- `ruby runner.rb`
 This will start the worker that will consume from `my-queue`, log messages in the terminal acknowledge the messages have been received so RabbitMQ can remove them from the queue once processed.
 
 In the third tab:
