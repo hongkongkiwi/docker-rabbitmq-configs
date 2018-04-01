@@ -14,7 +14,19 @@ module RabbitMQ
       end
     end
 
+    def ack(delivery_info)
+      channel.ack(delivery_info.delivery_tag)
+    end
+
+    def nack(delivery_info)
+      channel.nack(delivery_info.delivery_tag)
+    end
+
     def close
+      channel.queue_delete(queue: 'my-queue')
+      channel.queue_delete(queue: 'my-queue.invalid')
+      channel.queue_delete(queue: 'my-queue.retry')
+      channel.queue_delete(queue: 'my-queue.dead')
       @channel.close
     end
 
