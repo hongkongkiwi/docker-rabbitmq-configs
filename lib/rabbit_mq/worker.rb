@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module RabbitMQ
   module Worker
     extend self
@@ -6,13 +8,12 @@ module RabbitMQ
       channel = RabbitMQ::Connection.channel
       queue =
         channel
-          .queue('my-queue',
-                durable: true,
-                arguments: {
-          "x-dead-letter-exchange" => "my-exchange.dead",
-          "x-message-ttl" => 10000
-        }
-      )
+        .queue('my-queue',
+               durable: true,
+               arguments: {
+                 'x-dead-letter-exchange' => 'my-exchange.dead',
+                 'x-message-ttl' => 10_000
+               })
 
       channel.prefetch(1)
       puts ' [*] Waiting for messages. To exit press CTRL+C'
