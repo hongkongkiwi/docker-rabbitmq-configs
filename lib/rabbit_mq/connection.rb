@@ -20,7 +20,7 @@ module RabbitMQ
 
     def connection_string
       # https://www.rabbitmq.com/uri-spec.html
-      'amqp://me:me@localhost/my-vhost'
+      'amqp://me:me@rabbit/my-vhost'
     end
   end
 end
