@@ -24,7 +24,6 @@ module RabbitMQ
 
     def close
       channel.queue_delete(queue: 'my-queue')
-      channel.queue_delete(queue: 'my-queue.invalid')
       channel.queue_delete(queue: 'my-queue.retry')
       channel.queue_delete(queue: 'my-queue.dead')
       @channel.close
