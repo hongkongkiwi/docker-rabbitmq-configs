@@ -45,12 +45,6 @@
       "x-message-ttl": 5000
     }
   }, {
-    "name": "my-queue.unrouted",
-    "vhost": "my-vhost",
-    "durable": false,
-    "auto_delete": false,
-    "arguments": {}
-  }, {
     "name": "my-queue.dead",
     "vhost": "my-vhost",
     "durable": false,
@@ -65,17 +59,9 @@
     "auto_delete": false,
     "internal": false,
     "arguments": {
-      "alternate-exchange": "my-exchange.unrouted",
+      "alternate-exchange": "my-exchange.dead",
       "x-match": "any"
     }
-  }, {
-    "name": "my-exchange.unrouted",
-    "vhost": "my-vhost",
-    "type": "fanout",
-    "durable": true,
-    "auto_delete": false,
-    "internal": false,
-    "arguments": {}
   }, {
     "name": "my-exchange.dead",
     "vhost": "my-vhost",
@@ -115,13 +101,6 @@
     "destination": "my-queue.retry",
     "destination_type": "queue",
     "routing_key": "",
-    "arguments": {}
-  }, {
-    "source": "my-exchange.unrouted",
-    "vhost": "my-vhost",
-    "destination": "my-queue.unrouted",
-    "destination_type": "queue",
-    "routing_key": "undefined",
     "arguments": {}
   }]
 }
