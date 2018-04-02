@@ -23,7 +23,7 @@ module RabbitMQ
     end
 
     def close
-      channel.queue_delete(queue: 'my-queue')
+      channel.queue_delete(queue: 'my-queue.worker')
       channel.queue_delete(queue: 'my-queue.retry')
       channel.queue_delete(queue: 'my-queue.dead')
       @channel.close
@@ -31,7 +31,7 @@ module RabbitMQ
 
     def connection_string
       # https://www.rabbitmq.com/uri-spec.html
-      'amqp://me:me@rabbit/my-vhost'
+      ENV.fetch('RABBITMQ_DEFAULT_URL')
     end
   end
 end

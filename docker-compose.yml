@@ -6,6 +6,8 @@ services:
     container_name: worker
     depends_on:
     - rabbit
+    environment:
+    - RABBITMQ_DEFAULT_URL=amqp://me:me@rabbit/my-vhost
   rabbit:
       image: rabbitmq:3.7.3-management
       container_name: rabbit
