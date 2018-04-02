@@ -22,9 +22,9 @@ module RabbitMQ
       end
 
       def close
-        channel.queue_delete(queue: 'my-queue.worker')
-        channel.queue_delete(queue: 'my-queue.retry')
-        channel.queue_delete(queue: 'my-queue.dead')
+        channel.queue_delete(queue: "#{ENV.fetch('RABBITMQ_PREFIX')}-queue.worker")
+        channel.queue_delete(queue: "#{ENV.fetch('RABBITMQ_PREFIX')}-queue.retry")
+        channel.queue_delete(queue: "#{ENV.fetch('RABBITMQ_PREFIX')}-queue.dead")
         @channel.close
       end
 

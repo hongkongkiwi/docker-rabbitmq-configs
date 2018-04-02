@@ -14,7 +14,9 @@ module RabbitMQ
           .direct(
             'my-exchange',
             durable: true,
-            arguments: { 'alternate-exchange' => 'my-exchange.unrouted' }
+            arguments: {
+              'alternate-exchange' => "#{ENV.fetch('RABBITMQ_PREFIX')}-exchange.dead"
+            }
           ).publish(
             format_payload(payload),
             routing_key: routing_key,
@@ -25,7 +27,7 @@ module RabbitMQ
       def retry(payload, routing_key = 'test')
         channel
           .fanout(
-            'my-exchange.retry',
+            "#{ENV.fetch('RABBITMQ_PREFIX')}-exchange.retry",
             durable: true
           ).publish(
             format_payload(payload),
