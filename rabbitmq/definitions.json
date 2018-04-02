@@ -27,7 +27,7 @@
   }],
   "policies": [],
   "queues": [{
-    "name": "my-queue",
+    "name": "my-queue.worker",
     "vhost": "my-vhost",
     "durable": true,
     "auto_delete": false,
@@ -52,7 +52,7 @@
     "arguments": {}
   }],
   "exchanges": [{
-    "name": "my-exchange",
+    "name": "my-exchange.worker",
     "vhost": "my-vhost",
     "type": "direct",
     "durable": true,
@@ -80,9 +80,9 @@
     "arguments": {}
   }],
   "bindings": [{
-    "source": "my-exchange",
+    "source": "my-exchange.worker",
     "vhost": "my-vhost",
-    "destination": "my-queue",
+    "destination": "my-queue.worker",
     "destination_type": "queue",
     "routing_key": "test",
     "arguments": {
