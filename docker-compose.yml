@@ -8,6 +8,7 @@ services:
     - rabbit
     environment:
     - RABBITMQ_DEFAULT_URL=amqp://me:me@rabbit/my-vhost
+    - RABBITMQ_PREFIX=my
   rabbit:
       image: rabbitmq:3.7.3-management
       container_name: rabbit
