@@ -29,7 +29,7 @@ module RabbitMQ
 
     def queue
       channel
-        .queue('my-queue',
+        .queue('my-queue.worker',
                durable: true,
                arguments: {
                  'x-dead-letter-exchange' => 'my-exchange.dead',
@@ -63,7 +63,7 @@ module RabbitMQ
       logger.error "#{self.class.name}: #{error.class} #{error.message || ''}"
       logger.debug "#{error.backtrace.join("\n\t")}"
       if error.is_a? RabbitMQ::MessageError
-        logger.info "#{self.class.name} RabbitMQ::MessageError publishing to dead queue: #{payload}"
+        logger.info "#{self.class.name} publishing to dead queue: #{payload}"
         channel.nack(delivery_info.delivery_tag)
         return
       end
