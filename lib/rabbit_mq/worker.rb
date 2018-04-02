@@ -38,8 +38,7 @@ module RabbitMQ
       channel.ack(delivery_info.delivery_tag)
     rescue RabbitMQ::MessageError => error
       log_error(error)
-      logger.info "#{self.class.name} publishing to dead queue: #{payload}"
-      channel.nack(delivery_info.delivery_tag)
+      RabbitMQ::Publisher.dead(delivery_info, properties, payload)
     rescue StandardError => error
       log_error(error)
       retry_message(delivery_info, properties, payload)
@@ -51,34 +50,23 @@ module RabbitMQ
     end
 
     def retry_message(delivery_info, properties, payload)
-      payload = increment_message_count(payload)
+      payload = increment_delivery_count(payload)
       if (payload['delivery_count'] > max_retries)
         logger.info "#{self.class.name}" \
-          " delivery_count exceeded max_retries of #{max_retries};" \
-          ' publishing to dead queue'
-        channel.nack(delivery_info.delivery_tag)
-      else
-        logger.info "#{self.class.name} publishing to retry exchange"
-        channel.ack(delivery_info.delivery_tag)
-        RabbitMQ::Publisher.retry(payload)
+          " delivery_count exceeded max_retries of #{max_retries};"
+        RabbitMQ::Publisher.dead(delivery_info, properties, payload)
+        return
       end
+      RabbitMQ::Publisher.retry(delivery_info, properties, payload)
     end
 
-    def check_max_retries(delivery_info, properties, payload)
-      return if (payload['delivery_count'] < max_retries)
-      logger.info "#{self.class.name}" \
-        " delivery_count exceeded max_retries of #{max_retries};" \
-        ' publishing to dead queue'
-      channel.nack(delivery_info.delivery_tag)
-    end
-
-    def increment_message_count(payload)
+    def increment_delivery_count(payload)
       if payload.key?('delivery_count')
         payload['delivery_count'] += 1
       else
         payload['delivery_count'] = 1
       end
-      logger.info "#{self.class.name}: " \
+      logger.info "#{self.class.name} " \
         "delivery_count = #{payload['delivery_count']} for #{payload}"
       payload
     end
