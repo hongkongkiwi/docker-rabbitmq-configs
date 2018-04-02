@@ -30,7 +30,8 @@ module RabbitMQ
       end
 
       def retry(payload, routing_key = 'test')
-        logger.info "#{self.class.name} publishing to retry exchange: #{payload}"
+        logger.debug self.class.name \
+          " publishing to retry exchange: #{payload}"
         channel.ack(delivery_info.delivery_tag)
         channel
           .fanout(
