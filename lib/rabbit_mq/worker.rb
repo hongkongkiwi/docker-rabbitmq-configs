@@ -13,7 +13,8 @@ module RabbitMQ
     end
 
     def add_observer(observer)
-      raise 'Observer must have an #update method' unless observer.respond_to?(:update)
+      error = 'Observer must have an #update method'
+      raise error unless observer.respond_to?(:update)
       @observers << observer
     end
 
@@ -21,7 +22,7 @@ module RabbitMQ
       observers.each do |observer|
         observer.update(delivery_info, properties, body)
       end
-   end
+    end
 
     def channel
       RabbitMQ::Connection.channel
@@ -33,65 +34,70 @@ module RabbitMQ
                durable: true,
                arguments: {
                  'x-dead-letter-exchange' => 'my-exchange.dead',
-                 'x-message-ttl' => 20000
+                 'x-message-ttl' => 20_000
                })
     end
 
     def run
       channel.prefetch(1)
       logger.info ' [*] Waiting for messages. To exit press CTRL+C'
-
-      begin
-        queue
-          .subscribe(manual_ack: true, block: true) do |delivery_info, properties, payload|
-          logger.info " [x] Received message"
-          logger.info " [x] Parsing payload"
-          payload = parser.parse(payload)
-          logger.info ' [x] Notifying observers'
-          notify_observers(delivery_info, properties, payload)
-          logger.info ' [x] Done, ack message'
-          channel.ack(delivery_info.delivery_tag)
-        rescue StandardError => error
-          handle_error(error, delivery_info, properties, payload)
-        end
-      rescue Interrupt => _
-        RabbitMQ::Connection.close
+      queue
+        .subscribe(
+          manual_ack: true, block: true
+        ) do |delivery_info, properties, payload|
+        execute(delivery_info, properties, payload)
       end
+    rescue Interrupt => _
+      RabbitMQ::Connection.close
     end
 
-    def handle_error(error, delivery_info, _properties, payload)
-      logger.error "#{self.class.name}: #{error.class} #{error.message || ''}"
-      logger.debug "#{error.backtrace.join("\n\t")}"
+    def execute(delivery_info, properties, payload)
+      logger.info ' [x] Received message'
+      logger.info ' [x] Parsing payload'
+      payload = parser.parse(payload)
+      logger.info ' [x] Notifying observers'
+      notify_observers(delivery_info, properties, payload)
+      logger.info ' [x] Done, ack message'
+      channel.ack(delivery_info.delivery_tag)
+    rescue StandardError => error
+      handle_error(error, delivery_info, properties, payload)
+    end
+
+    def handle_error(error, delivery_info, properties, payload)
+      logger.error "#{self.class.name}: #{error.class} #{error.message}"
+      logger.debug error.backtrace.join("\n\t").to_s
       if error.is_a? RabbitMQ::MessageError
         logger.info "#{self.class.name} publishing to dead queue: #{payload}"
         channel.nack(delivery_info.delivery_tag)
         return
       end
-      increment_message_count(payload)
-      if exceeded_max_retries?(payload)
-        logger.info "#{self.class.name}:" \
-          " delivery_count exceeded max_retries of #{max_retries};" \
-          ' publishing to dead queue'
-        channel.nack(delivery_info.delivery_tag)
-      else
-        logger.info "#{self.class.name}: publishing to retry exchange"
-        channel.ack(delivery_info.delivery_tag)
-        RabbitMQ::Publisher.retry(payload)
-      end
+      retry_message(delivery_info, properties, payload)
     end
 
-    def exceeded_max_retries?(payload)
-      payload["delivery_count"] >= max_retries
+    def retry_message(delivery_info, properties, payload)
+      increment_message_count(payload)
+      check_max_retries(delivery_info, properties, payload)
+      logger.info "#{self.class.name}: publishing to retry exchange"
+      channel.ack(delivery_info.delivery_tag)
+      RabbitMQ::Publisher.retry(payload)
+    end
+
+    def check_max_retries(payload, _properties, delivery_info)
+      return if payload['delivery_count'] < max_retries
+      logger.info "#{self.class.name}:" \
+        " delivery_count exceeded max_retries of #{max_retries};" \
+        ' publishing to dead queue'
+      channel.nack(delivery_info.delivery_tag)
     end
 
     def increment_message_count(payload)
-      if payload.key?("delivery_count")
-        payload["delivery_count"] += 1
+      if payload.key?('delivery_count')
+        payload['delivery_count'] += 1
       else
-        payload["delivery_count"] = 1
+        payload['delivery_count'] = 1
       end
       logger.info "#{self.class.name}: " \
-        "delivery_count = #{payload["delivery_count"]} for #{payload}"
+        "delivery_count = #{payload['delivery_count']} for #{payload}"
     end
   end
 end
