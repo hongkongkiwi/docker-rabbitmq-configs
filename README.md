@@ -13,14 +13,10 @@ Open the definitions.json file and replace the names of user, my_vhost, exchange
 ## Command line
 
 In one tab:
-- `docker-compose up rabbit`
-This will spin up the RabbitMQ instance and display its logs
+- `bin/docker-compose.sh`
+This will start the rabbitmq instance (called 'rabbit') and worker that will consume from `my-queue.worker`, log messages in the terminal acknowledge the messages have been received so RabbitMQ can remove them from the queue once processed.
 
 In the second tab:
-- `docker-compose up worker`
-This will start the worker that will consume from `my-queue`, log messages in the terminal acknowledge the messages have been received so RabbitMQ can remove them from the queue once processed.
-
-In the third tab:
 - `pry` / `irb`
 - `require 'lib/rabbit_mq'`
 - `RabbitMQ::Publisher.publish` + YOUR MESSAGE OR PAYLOAD
@@ -30,19 +26,19 @@ See below for more on the configuration of the exchanges and queues.
 
 ## RabbitMQ UI
 
-`docker-compose up`
+- `bin/docker-compose.sh`
 
 login at localhost:15672
 
 username and password are set in the definitions.json, currently "me" and "me"
 
-Click on the exchanges tab to view exchanges. The ones defined in definitions.json should be listed.
+Click on the exchanges tab to view exchanges. The ones defined in rabbitmq/definitions.json should be listed.
 
-Publish a message on "my_exchange" with routing key: "test"  
+Publish a message on "my_exchange.worker" with routing key: "test"  
 
 Click on the queues tab.
 
-`my_queue` should show a spike of activity as it received the message.
+`my_queue.worker` should show a spike of activity as it received the message.
 
 After the time to live value (set as 10000, equivalent to 10 seconds):
 - The message will be considered dead
@@ -52,7 +48,7 @@ After the time to live value (set as 10000, equivalent to 10 seconds):
 `my_queue.dead`should show an additional message
 
 Publish a message on "my_exchange" with no routing key.  
-This should be listed in the `unrouted` queue
+This should be listed in the `my_queue.dead` queue
 
 Below explains how to set up these exchanges, queues and bindings. Either use the UI or amend the definitions.json file.
 
@@ -64,7 +60,7 @@ Define a queue, such as "my-queue", then the bindings between them with the sour
 
 ### Dead letter exchange and queue
 
-- On your main queue, eg `my_queue`, add arguments
+- On your main queue, eg `my_queue.worker`, add arguments
     - "x-dead-letter-exchange": "my-exchange.dead"
     - "x-message-ttl": 10000
 
@@ -78,13 +74,13 @@ Define a queue, such as "my-queue", then the bindings between them with the sour
 
 - Create `my-queue.retry` queue bound to `my-exchange.retry`
 - Create exchange `my-exchange.retry` with arguments:
-  - Set `x-dead-letter-exchange` to `my-exchange`
+  - Set `x-dead-letter-exchange` to `my-exchange.worker`
   - Set `x-message-ttl` to a retry-ttl variable, eg 300000 ms (5 minutes)
 
 - When you have an issue with a message from `my-queue`
   - nack the message `channel.nack(delivery_info.delivery_tag)`
   - then publish to the `my-exchange.retry`
-  - after the retry-ttl, it will be sent to `my-exchange`, then `my-queue`
+  - after the retry-ttl, it will be sent to `my-exchange.worker`, then `my-queue`
 
 - To stop an infinite loop, you need to include a publish_count with a maximum value.
   - Ensure you parse the payload, eg if it is JSON
@@ -102,9 +98,10 @@ To create an exchange and queue for messages that cannot be routed due to not ha
 ## Further Development
 
 - Extracting definitions from a config yml file
-- Use Environment variables for username, password, connections string, setting defaults, etc
-- Prefetch
-- Purging and destroying queues
+- Use Environment variables for queue names, username, password, setting defaults, etc
+- Purging and destroying queues on close of connection
+- Prefetch variable
+- variables for worker_ttl and retry_ttl
 
 Documentation  
 
