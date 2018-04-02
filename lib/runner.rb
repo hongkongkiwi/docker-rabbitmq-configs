@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-require_relative './lib/rabbit_mq'
-require_relative './lib/worker_observer'
+require_relative 'rabbit_mq'
+require_relative 'worker_observer'
 
 logger = RabbitMQ::LoggerFactory.build
 parser = RabbitMQ::JSONParser
