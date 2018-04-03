@@ -12,21 +12,9 @@ Open the definitions.json file and replace the names of user, my_vhost, exchange
 
 ## Command line
 
-In one tab:
-- `bin/docker-compose.sh`
-This will start the rabbitmq instance (called 'rabbit') and worker that will consume from `my-queue.worker`, log messages in the terminal acknowledge the messages have been received so RabbitMQ can remove them from the queue once processed.
-
-In the second tab:
-- `pry` / `irb`
-- `require 'lib/rabbit_mq'`
-- `RabbitMQ::Publisher.publish` + YOUR MESSAGE OR PAYLOAD
-This will send the message to `my-exchange`, which will route it to `my-queue` with the routing key `test`.
-
-See below for more on the configuration of the exchanges and queues.
+`docker-compose up`
 
 ## RabbitMQ UI
-
-- `bin/docker-compose.sh`
 
 login at localhost:15672
 
