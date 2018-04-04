@@ -12,7 +12,13 @@ Open the definitions.json file and replace the names of user, my_vhost, exchange
 
 ## Command line
 
-`docker-compose up`
+To start RabbitMQ on docker  
+
+- `docker-compose up`
+
+To shut down RabbitMQ on docker  
+
+- `docker-compose down -v`
 
 ## RabbitMQ UI
 
@@ -65,16 +71,6 @@ Define a queue, such as "my-queue", then the bindings between them with the sour
   - Set `x-dead-letter-exchange` to `my-exchange.worker`
   - Set `x-message-ttl` to a retry-ttl variable, eg 300000 ms (5 minutes)
 
-- When you have an issue with a message from `my-queue`
-  - nack the message `channel.nack(delivery_info.delivery_tag)`
-  - then publish to the `my-exchange.retry`
-  - after the retry-ttl, it will be sent to `my-exchange.worker`, then `my-queue`
-
-- To stop an infinite loop, you need to include a publish_count with a maximum value.
-  - Ensure you parse the payload, eg if it is JSON
-  - if your payload is a hash, you can do payload['publish_count'] = 1, then increment it for subsequent times
-  - if publish_count reached the maximum value, nack the message to send it to the dead queue
-
 ### Unrouted exchange and queue
 
 To create an exchange and queue for messages that cannot be routed due to not having a defined routing key or headers:
@@ -85,25 +81,8 @@ To create an exchange and queue for messages that cannot be routed due to not ha
 
 ## Further Development
 
-- Extracting definitions from a config yml file
-- Use Environment variables for queue names, username, password, setting defaults, etc
-- Purging and destroying queues on close of connection
-- Prefetch variable
-- variables for worker_ttl and retry_ttl
-
-Documentation  
-
-- Use nack to send to dead queue
-- Use ack for successfully consumed message
-- Use nack when republishing from consumer, eg to retry queue, otherwise it will leave message `unacked` on a queue
-- Write up setting up a RabbitMQ instance on Docker with a vhost, exchanges, queues and bindings
-- Publisher that can publish to various exchanges
-- Creating a Consumer, including acknowledgements, rejects, re-queuing, and retry counts
-- Extracting message processing out of the worker using Observers
-- How to use the ruby RabbitMQ module with the connection, publisher and worker
 - Diagramming
 - Key concepts, eg vhost is a host within a RabbitMQ instance, allowing multiple apps to use the same instance for different purposes, types of exchange etc
-- Issues to note, eg connecting to queues and exchanges with the same configuration that is in the RabbitMQ instance
 
 ## Links
 
