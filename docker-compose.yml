@@ -1,10 +1,10 @@
 version: "3"
 services:
   rabbit:
-      image: rabbitmq:3.7.3-management
-      container_name: rabbit
-      ports:
-        - "15672:15672"
-      volumes:
-        - ./rabbitmq.conf:/etc/rabbitmq.conf:ro
-        - ./definitions.json:/etc/rabbitmq/definitions.json:ro
+    image: rabbitmq:3.7.3-management
+    container_name: rabbit
+    ports:
+    - "15672:15672"
+    volumes:
+    - ./rabbitmq.conf:/etc/rabbitmq.conf:ro
+    - ./definitions.json:/etc/rabbitmq/definitions.json:ro
