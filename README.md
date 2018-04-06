@@ -1,16 +1,12 @@
-# rabbitmq-docker-compose
+# RabbitMQ on Docker
 
-An example of a RabbitMQ with custom configuration loaded with docker-compose
+An example of a RabbitMQ with custom configuration loaded with Docker or Docker Compose
 
 This is designed as a tutorial and boilerplate that you can customise and extend for the setup you desire.
 
 There are instructions for using it via the RabbitMQ UI, as well as ruby module that allows you to send messages and process them.
 
-## Configuration
-
-Open the definitions.json file and replace the names of user, my_vhost, exchanges and queues with the ones you need.
-
-## Command line
+## Docker compose
 
 To start RabbitMQ on docker  
 
@@ -19,6 +15,24 @@ To start RabbitMQ on docker
 To shut down RabbitMQ on docker  
 
 - `docker-compose down -v`
+
+# RabbitMQ Docker
+
+Build and run: `./bin/run.sh`  
+
+To just build it: `./bin/build.sh`  
+
+This loads the configuration defined in the rabbitmq folder  
+
+in the Dockerfile:
+```
+COPY ./rabbitmq/rabbitmq.conf ./etc/rabbitmq/rabbitmq.conf
+COPY ./rabbitmq/definitions.json ./etc/rabbitmq/definitions.json
+```
+
+## Configuration
+
+Open the definitions.json file and replace the names of user, my_vhost, exchanges and queues with the ones you need.
 
 ## RabbitMQ UI
 
