@@ -1,10 +1,16 @@
 # RabbitMQ on Docker
 
-An example of a RabbitMQ with custom configuration loaded with Docker or Docker Compose
+An example of a RabbitMQ instance running on Docker with custom configuration. This can be loaded with Docker or Docker Compose.
 
-This is designed as a tutorial and boilerplate that you can customise and extend for the setup you desire.
+This is designed as a tutorial and template that you can customise and extend for the implementation you desire.
 
-There are instructions for using it via the RabbitMQ UI, as well as ruby module that allows you to send messages and process them.
+This Readme will cover:  
+- Useful docker commands
+- RabbitMQ key concepts
+- How the configuration files in the `rabbitmq` folder configure the RabbitMQ instance
+- Using docker and docker-compose to run and remove the RabbitMQ images and containers
+- How to use the RabbitMQ UI to view, create and delete exchanges, queues, bindings
+- How to configure work, dead and retry exchanges and queues
 
 ## Docker
 
@@ -17,10 +23,19 @@ Useful commands:
 
 There are scripts in the `bin` folder to build, run, stop and remove containers and images. See how to use them below.
 
+## RabbitMQ key concepts
+
+- [www.rabbitmq.com AMQP Concepts](https://www.rabbitmq.com/tutorials/amqp-concepts.html)
+- [www.rabbitmq.com AMQP Quick Reference Guide](https://www.rabbitmq.com/amqp-0-9-1-quickref.html)
+- [www.rabbitmq.com Get Started](https://www.rabbitmq.com/getstarted.html)
+- [www.rabbitmq.com Documentation](https://www.rabbitmq.com/documentation.html)
+- [www.cloudamqp.com blog RabbitMQ for Beginners: What is RabbitMQ?](https://www.cloudamqp.com/blog/2015-05-18-part1-rabbitmq-for-beginners-what-is-rabbitmq.html)
+
 ## rabbitmq folder
 
-This contains the definitions.json and rabbitmq.conf files that are loaded into the rabbitmq-docker instance. They can be overwritten in the files or through the RabbitMQ UI at localhost:15672, amend then export the definitions from the homepage
-- Admin user with username `me` and password `me`
+This contains the `definitions.json` and `rabbitmq.conf` files that are loaded into the RabbitMQ instance. The configuration be overwritten directly in the files. Alternatively log into RabbitMQ UI at localhost:15672, amend then `Export definitions` with
+Filename for download: `definitions.json` from the `Overview` tab and save them into this folder. The current configuration creates:  
+- Admin user with username `me` and password `me` (use this to log into the RabbitMQ UI at localhost:15672)
 - Exchanges: `work` (with routing key 'work'), `retry` and `dead`
 - Queues: `work`, `retry` and `dead`
 - Bindings for queues to exchanges
