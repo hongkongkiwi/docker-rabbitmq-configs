@@ -42,79 +42,81 @@ Filename for download: `definitions.json` from the `Overview` tab and save them 
 
 See below for more detail on the configuration of the bindings and arguments for the exchanges and queues.
 
-## Docker compose
-
-To start RabbitMQ on docker  
-
-- `docker-compose up`
-
-To start RabbitMQ on docker to run without logging to the current terminal session
-
-- `docker-compose up -d`
-
-To shut down RabbitMQ on docker  
-
-- `docker-compose down -v`
-
-There are bash scripts in the `bin` folder to stop and remove the containers and images if you prefer. They both take a `--silent` flag if you don't want them to log output, eg `bin/remove --silent`.  
-- bin/remove.sh - Stops and removes the rabbitmq-docker container and image
-- bin/stop.sh - will just stop the rabbitmq-docker container
-
-View the logs  
-
-- `docker-compose logs rabbitmq-docker`
-
-To view logs and follow output  
-
-- `docker-compose logs --follow rabbitmq-docker`
-
 # RabbitMQ Docker
 
-Build and run: `./bin/run.sh`  
+There are bash scripts in the `bin` folder to:  
+- `run.sh` - This will stop and remove existing `rabbitmq-docker` images and container, then build a new image and run the container `rabbitmq-docker`
+- `build.sh` - builds the image `rabbitmq-docker` using the Dockerfile
+- `stop.sh` - stops the container `rabbitmq-docker`. It takes an optional `--silent` flag if you don't want it to log output, eg `bin/stop --silent`.
+- `remove.sh` - stops and removes the `rabbitmq-docker` containers and images. It also has an optional `--silent` flag if you don't it them to log output, eg `bin/remove --silent`.  
 
-To just build it: `./bin/build.sh`  
-
-This loads the configuration defined in the rabbitmq folder  
-
-in the Dockerfile:
+The `Dockerfile` will create an image from `rabbitmq:3.7.3-management` and loads the configuration defined in the `rabbitmq` folder.  
 ```
 COPY ./rabbitmq/rabbitmq.conf ./etc/rabbitmq/rabbitmq.conf
 COPY ./rabbitmq/definitions.json ./etc/rabbitmq/definitions.json
 ```
 
-There are bash scripts in the `bin` folder to stop and remove the containers and images if you would rather not do this manually. They both take a `--silent` flag if you don't want them to log output, eg `bin/remove --silent`.  
-- bin/remove.sh - Stops and removes the rabbitmq-docker container and image
-- bin/stop.sh - will just stop the rabbitmq-docker container
+## Docker Compose
+
+This uses the `docker-compose.yml`, which also uses the image `rabbitmq:3.7.3-management` and loads the `definitions.json` and `rabbitmq.conf` files into the container.
+
+#### Docker Compose terminal commands  
+- `docker-compose up` Start the RabbitMQ instance with docker-compose    
+- `docker-compose up -d` Start RabbitMQ on docker to run without logging to the current terminal session  
+- `docker-compose down -v` To shut down the RabbitMQ instance and remove the volumes (the `definitions.json` and `rabbitmq.conf` configuration files)
+- `docker-compose logs rabbitmq-docker` View the logs  
+- `docker-compose logs --follow rabbitmq-docker` To view logs and follow output  
+
+You can also use the `bin` scripts to stop and remove the containers and images here too.
+- `bin/remove.sh` - Stops and removes the rabbitmq-docker container and image
+- `bin/stop.sh` - will just stop the rabbitmq-docker container
 
 ## Configuration
 
-Open the definitions.json file and replace the names of user, my_vhost, exchanges and queues with the ones you need.
+Open the `definitions.json` file and replace the names of user, vhost, exchanges, queues and bindings with the ones you need.
+
+It can be easier to use the RabbitMQ UI to configure these  
+- Log into RabbitMQ UI at `localhost:15672` using the login `me` for username and password (the default is `guest` if you are not using the `definitions.json` file in the `rabbitmq` folder)
+- amend the configuration
+- On the `Overview` tab, click on `Export definitions` and set `Filename for download: definitions.json`, and then `Dowload broker definitions` and save them into the `rabbitmq` folder
 
 ## RabbitMQ UI
 
-login at localhost:15672
+### Logging in
+- Create and run the RabbitMQ instance using Docker or Docker Compose
+- login at `localhost:15672`
+- username and password are set in the `definitions.json`, currently "me" and "me"
 
-username and password are set in the definitions.json, currently "me" and "me"
+### Publishing messages
 
-Click on the exchanges tab to view exchanges. The ones defined in rabbitmq/definitions.json should be listed.
+This configuration shows you how to use exchanges and queues with three main purposes:
+- `work` the main exchange and queue that an application would consume messages from.
+- `retry` publish a message here for it to wait for the time to live before routing the message to the `work` exchange. This is useful if a message throws an error or cannot be consumed at the time the message is fetched from the `work` queue.
+- `dead` a place to store messages that could not be delivered or have expired their time to live on the `work` queue.
 
-Publish a message on "my_exchange.worker" with routing key: "test"  
+#### The work exchange and queue
 
-Click on the queues tab.
-
-`my_queue.worker` should show a spike of activity as it received the message.
-
-After the time to live value (set as 10000, equivalent to 10 seconds):
-- The message will be considered dead
+- Click on the `Exchanges` tab to view exchanges. The ones defined in `rabbitmq/definitions.json` should be listed
+- Publish a message on `my-exchange.work` exchange with routing key: "work"  
+- Click on the queues tab.
+- `my-queue.work` should show a spike of activity and the message count should increase by 1 for the configured time to live value (currently set at 5 seconds).
+- After the time to live has expired, the message will be considered dead
 - It will be routed to the dead letter exchange: `my-exchange.dead`
-- This places the message in the queue `my_queue.dead`
+- This places the message in the queue `my-queue.dead`
+- `my_queue.dead`should show an additional message. View it by clicking on the queue, then `Get messages` -> `Get messages`
 
-`my_queue.dead`should show an additional message
+#### The retry exchange and queue
+- Click on the `Exchanges` tab, then click on the `my-exchange.retry` exchange
+- Publish a message on `my-exchange.retry` exchange with routing key: "work"  
+- Click on the queues tab. The `my-queue.retry` message count should increase by 1 for the configured time to live value (currently set at 5 seconds).
+- After the time to live has expired, the message will be routed to the `my-exchange.work`
+- This places the message in the queue `my-queue.work` for the time to live, before routing to the `my-exchange.dead`, which sends it to `my-queue.dead`
 
-Publish a message on "my_exchange" with no routing key.  
-This should be listed in the `my_queue.dead` queue
+#### Un-routed messages
+- Publish a message on `my-exchange.work` without a routing key or one not defined in the configuration.
+- This should be routed to `my-queue.dead`
 
-Below explains how to set up these exchanges, queues and bindings. Either use the UI or amend the definitions.json file.
+Below explains how to set up these exchanges, queues and bindings.
 
 ### The main exchange and queue
 
