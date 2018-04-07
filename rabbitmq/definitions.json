@@ -33,7 +33,7 @@
     "auto_delete": false,
     "arguments": {
       "x-dead-letter-exchange": "my-exchange.dead",
-      "x-message-ttl": 20000
+      "x-message-ttl": 5000
     }
   }, {
     "name": "my-queue.retry",
@@ -84,9 +84,9 @@
     "vhost": "my-vhost",
     "destination": "my-queue.work",
     "destination_type": "queue",
-    "routing_key": "test",
+    "routing_key": "work",
     "arguments": {
-      "routing_key": "test"
+      "routing_key": "work"
     }
   }, {
     "source": "my-exchange.dead",
