@@ -12,9 +12,21 @@ To start RabbitMQ on docker
 
 - `docker-compose up`
 
+To start RabbitMQ on docker to run without logging to the current terminal session
+
+- `docker-compose up -d`
+
 To shut down RabbitMQ on docker  
 
 - `docker-compose down -v`
+
+View the logs  
+
+- `docker-compose logs rabbitmq-docker`
+
+To view logs and follow output  
+
+- `docker-compose logs --follow rabbitmq-docker`
 
 # RabbitMQ Docker
 
