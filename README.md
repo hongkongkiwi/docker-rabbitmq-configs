@@ -17,6 +17,16 @@ Useful commands:
 
 There are scripts in the `bin` folder to build, run, stop and remove containers and images. See how to use them below.
 
+## rabbitmq folder
+
+This contains the definitions.json and rabbitmq.conf files that are loaded into the rabbitmq-docker instance. They can be overwritten in the files or through the RabbitMQ UI at localhost:15672, amend then export the definitions from the homepage
+- Admin user with username `me` and password `me`
+- Exchanges: `work` (with routing key 'work'), `retry` and `dead`
+- Queues: `work`, `retry` and `dead`
+- Bindings for queues to exchanges
+
+See below for more detail on the configuration of the bindings and arguments for the exchanges and queues.
+
 ## Docker compose
 
 To start RabbitMQ on docker  
