@@ -42,7 +42,7 @@ Filename for download: `definitions.json` from the `Overview` tab and save them 
 
 See below for more detail on the configuration of the bindings and arguments for the exchanges and queues.
 
-# RabbitMQ Docker
+## RabbitMQ Docker
 
 There are bash scripts in the `bin` folder to:  
 - `run.sh` - This will stop and remove existing `rabbitmq-docker` images and container, then build a new image and run the container `rabbitmq-docker`
@@ -60,7 +60,7 @@ COPY ./rabbitmq/definitions.json ./etc/rabbitmq/definitions.json
 
 This uses the `docker-compose.yml`, which also uses the image `rabbitmq:3.7.3-management` and loads the `definitions.json` and `rabbitmq.conf` files into the container.
 
-#### Docker Compose terminal commands  
+### Docker Compose terminal commands  
 - `docker-compose up` Start the RabbitMQ instance with docker-compose    
 - `docker-compose up -d` Start RabbitMQ on docker to run without logging to the current terminal session  
 - `docker-compose down -v` To shut down the RabbitMQ instance and remove the volumes (the `definitions.json` and `rabbitmq.conf` configuration files)
@@ -116,23 +116,27 @@ This configuration shows you how to use exchanges and queues with three main pur
 - Publish a message on `my-exchange.work` without a routing key or one not defined in the configuration.
 - This should be routed to `my-queue.dead`
 
-Below explains how to set up these exchanges, queues and bindings.
+## Configuring exchanges, queues and bindings
+
+Below explains how to set up the exchanges, queues and bindings.
 
 ### The main exchange and queue
 
-Create an exchange "my-exchange". One of the simplest ways of routing is using a direct type exchange, where you define the "routing_key" in the bindings when linking the exchange to a queue. So for this example, specify the type as "direct".
+Create an exchange "my-exchange.work". One of the simplest ways of routing is using a direct type exchange, where you define the "routing_key" in the bindings when linking the exchange to a queue. So for this example, specify the type as "direct".
 
-Define a queue, such as "my-queue", then the bindings between them with the source being the exchange and the destination the queue. The destination_type is queue. Then in the arguments state the routing key, for example `"routing_key":"test"`
+Define a queue, such as "my-queue.work", then the bindings between them with the source being the exchange and the destination the queue. The destination_type is queue. Then in the arguments state the routing key, for example `"routing_key":"work"` (the routing key can be anything you want).
 
 ### Dead letter exchange and queue
 
-- On your main queue, eg `my_queue.worker`, add arguments
+- On your main queue, eg `my_queue.work`, add arguments
+```
     - "x-dead-letter-exchange": "my-exchange.dead"
-    - "x-message-ttl": 10000
+    - "x-message-ttl": 5000
+```
 
-`x-message-ttl` is the variable that stores the amount of time a message should be kept on a queue before being considered dead and routed to the `dead-letter-exchange`
+`x-message-ttl` is the variable that stores the amount of time a message should be kept on a queue before being considered dead and routed to the `dead-letter-exchange`. The 5000 here will keep it here for 5 seconds, which is useful for testing, but should be longer when used in production.
 
-- Define your dead letter exchange, eg "my-exchange.dead", and set it as type fanout
+- Define your dead letter exchange, eg `my-exchange.dead`, and set it as type `fanout` (fanout exchanges will send all messages onto queues without needing a routing key)
 - Define your dead letter queue, eg `my-queue.dead`
 - Bind the dead letter exchange to the dead letter queue
 
@@ -140,21 +144,13 @@ Define a queue, such as "my-queue", then the bindings between them with the sour
 
 - Create `my-queue.retry` queue bound to `my-exchange.retry`
 - Create exchange `my-exchange.retry` with arguments:
-  - Set `x-dead-letter-exchange` to `my-exchange.worker`
-  - Set `x-message-ttl` to a retry-ttl variable, eg 300000 ms (5 minutes)
+  - Set `x-dead-letter-exchange` to `my-exchange.work`
+  - Set `x-message-ttl` to a time you want it to wait on the retry queue before being sent back to the `work` exchange eg 5000 (5 seconds)
 
-### Unrouted exchange and queue
+### Dealing with un-routed messages
 
 To create an exchange and queue for messages that cannot be routed due to not having a defined routing key or headers:
-- Add as an argument to your main exchange: `"alternate-exchange": "my-exchange.dead"`
-- Define your unrouted exchange as a fanout exchange
-- Define an unrouted queue
-- bind your unrouted exchange to your unrouted queue
-
-## Further Development
-
-- Diagramming
-- Key concepts, eg vhost is a host within a RabbitMQ instance, allowing multiple apps to use the same instance for different purposes, types of exchange etc
+- Add as an argument to your `work` exchange: `"alternate-exchange": "my-exchange.dead"`
 
 ## Links
 
