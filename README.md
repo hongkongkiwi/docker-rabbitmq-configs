@@ -6,6 +6,17 @@ This is designed as a tutorial and boilerplate that you can customise and extend
 
 There are instructions for using it via the RabbitMQ UI, as well as ruby module that allows you to send messages and process them.
 
+## Docker
+
+Useful commands:  
+- `docker ps` view running containers
+- `docker ps -a` view all containers, including stopped ones
+- `docker rm [CONTAINER]` Removes a container
+- `docker images` lists images
+- `docker image rm [IMAGE]`
+
+There are scripts in the `bin` folder to build, run, stop and remove containers and images. See how to use them below.
+
 ## Docker compose
 
 To start RabbitMQ on docker  
@@ -19,6 +30,10 @@ To start RabbitMQ on docker to run without logging to the current terminal sessi
 To shut down RabbitMQ on docker  
 
 - `docker-compose down -v`
+
+There are bash scripts in the `bin` folder to stop and remove the containers and images if you prefer. They both take a `--silent` flag if you don't want them to log output, eg `bin/remove --silent`.  
+- bin/remove.sh - Stops and removes the rabbitmq-docker container and image
+- bin/stop.sh - will just stop the rabbitmq-docker container
 
 View the logs  
 
@@ -41,6 +56,10 @@ in the Dockerfile:
 COPY ./rabbitmq/rabbitmq.conf ./etc/rabbitmq/rabbitmq.conf
 COPY ./rabbitmq/definitions.json ./etc/rabbitmq/definitions.json
 ```
+
+There are bash scripts in the `bin` folder to stop and remove the containers and images if you would rather not do this manually. They both take a `--silent` flag if you don't want them to log output, eg `bin/remove --silent`.  
+- bin/remove.sh - Stops and removes the rabbitmq-docker container and image
+- bin/stop.sh - will just stop the rabbitmq-docker container
 
 ## Configuration
 
