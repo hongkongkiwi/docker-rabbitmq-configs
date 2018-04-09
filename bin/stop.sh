@@ -7,17 +7,27 @@ if [[ "$1" == "--silent" ]]; then
 fi
 
 log() {
-  if [ "$SILENT" = false ]; then
+  if ! $SILENT; then
     echo $1
   fi
 }
 
-if docker ps | grep rabbitmq-docker 2>/dev/null >&2; then
+run_command() {
+  if $SILENT; then
+    $1 &>/dev/null
+  else
+    $1
+  fi
+}
+
+if docker ps | grep rabbitmq-docker &>/dev/null; then
   log "Stopping docker container rabbitmq-docker"
-  docker stop $(docker ps | grep rabbitmq-docker | awk '{print $1}')
+  run_command "docker stop $(docker ps | grep rabbitmq-docker | awk '{print $1}')"
+  exit 0
 else
   log "Could not find running docker container rabbitmq-docker"
-  if docker ps -a | grep rabbitmq-docker 2>/dev/null >&2; then
+  if docker ps -a | grep rabbitmq-docker &>/dev/null; then
     log "Container rabbitmq-docker exists but not running"
   fi
+  exit 1
 fi
