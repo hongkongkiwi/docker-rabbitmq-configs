@@ -1,3 +1,3 @@
-[submodule "wait-for-rabbitmq-docker"]
-	path = wait-for-rabbitmq-docker
-	url = git@github.com:ryandav/wait-for-rabbitmq-docker.git
+[submodule "wait-for-it-docker"]
+	path = wait-for-it-docker
+	url = git@github.com:ryandav/wait-for-it-docker.git
