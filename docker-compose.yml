@@ -6,5 +6,5 @@ services:
     ports:
     - "15672:15672"
     volumes:
-    - ./rabbitmq/rabbitmq.conf:/etc/rabbitmq.conf:ro
-    - ./rabbitmq/definitions.json:/etc/rabbitmq/definitions.json:ro
+    - ./configs/rabbitmq.conf:/etc/rabbitmq.conf:ro
+    - ./configs/definitions.json:/etc/rabbitmq/definitions.json:ro
